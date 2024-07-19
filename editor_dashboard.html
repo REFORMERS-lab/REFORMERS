@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editor Dashboard</title>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyCq1MfkH0Nss-fKq9OQdnCv6Mvo8DJ2fZo",
+  authDomain: "reformers-95a35.firebaseapp.com",
+  projectId: "reformers-95a35",
+  storageBucket: "reformers-95a35.appspot.com",
+  messagingSenderId: "390780648804",
+  appId: "1:390780648804:web:457138f10783ebbf99ce71",
+  measurementId: "G-MQDL4Z01B1"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        var db = firebase.firestore();
+
+        function loadSubmissions() {
+            db.collection("drafts").where("status", "==", "submitted")
+                .get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        var data = doc.data();
+                        var article = document.createElement('div');
+                        article.innerHTML = `
+                            <h2>${data.title}</h2>
+                            <h3>${data.subtitle}</h3>
+                            <div>${data.content}</div>
+                            <textarea id="review-${doc.id}" placeholder="Add notes"></textarea>
+                            <button onclick="approve('${doc.id}')">Approve</button>
+                            <button onclick="reject('${doc.id}')">Reject</button>
+                        `;
+                        document.body.appendChild(article);
+                    });
+                });
+        }
+
+        function approve(docId) {
+            var notes = document.getElementById(`review-${docId}`).value;
+            db.collection("drafts").doc(docId).update({
+                status: 'approved',
+                notes: notes
+            });
+        }
+
+        function reject(docId) {
+            var notes = document.getElementById(`review-${docId}`).value;
+            db.collection("drafts").doc(docId).update({
+                status: 'rejected',
+                notes: notes
+            });
+        }
+
+        window.onload = loadSubmissions;
+    </script>
+</head>
+<body>
+    <h1>Editor Dashboard</h1>
+</body>
+</html>

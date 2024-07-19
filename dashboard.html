@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Author Dashboard</title>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyCq1MfkH0Nss-fKq9OQdnCv6Mvo8DJ2fZo",
+  authDomain: "reformers-95a35.firebaseapp.com",
+  projectId: "reformers-95a35",
+  storageBucket: "reformers-95a35.appspot.com",
+  messagingSenderId: "390780648804",
+  appId: "1:390780648804:web:457138f10783ebbf99ce71",
+  measurementId: "G-MQDL4Z01B1"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        var db = firebase.firestore();
+
+        function saveDraft() {
+            var title = document.getElementById('title').value;
+            var subtitle = document.getElementById('subtitle').value;
+            var content = tinymce.get("editor").getContent();
+
+            db.collection("drafts").add({
+                title: title,
+                subtitle: subtitle,
+                content: content,
+                author: firebase.auth().currentUser.uid,
+                status: 'draft'
+            })
+            .then((docRef) => {
+                alert("Draft saved with ID: " + docRef.id);
+            })
+            .catch((error) => {
+                console.error("Error adding document: ", error);
+            });
+        }
+
+        tinymce.init({
+            selector: 'textarea#editor',
+            menubar: false
+        });
+    </script>
+</head>
+<body>
+    <h1>Author Dashboard</h1>
+    <input type="text" id="title" placeholder="Title">
+    <input type="text" id="subtitle" placeholder="Subtitle">
+    <textarea id="editor"></textarea>
+    <button onclick="saveDraft()">Save Draft</button>
+</body>
+</html>
